@@ -6,15 +6,17 @@ const config: CapacitorConfig = {
   appName: 'WalletControl',
   webDir: 'dist',
   server: {
-    url: 'https://seu-site-publicado.lovable.app',
+    // Atualize esta URL com o endereço de publicação do seu site quando estiver pronto
+    url: 'https://seu-app-publicado.lovable.app',
     cleartext: true
   },
   android: {
     buildOptions: {
-      keystorePath: 'your-keystore.keystore',
-      keystoreAlias: 'key-alias',
-      keystorePassword: 'keystore-password',
-      keyPassword: 'key-password'
+      // Você precisará criar um keystore para assinar seu app
+      keystorePath: 'keystore-walletcontrol.keystore',
+      keystoreAlias: 'walletcontrol-key',
+      keystorePassword: 'sua-senha-segura',
+      keyPassword: 'sua-senha-segura'
     }
   }
 };
