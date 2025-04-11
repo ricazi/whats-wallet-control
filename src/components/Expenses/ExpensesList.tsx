@@ -17,9 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ShoppingCart, Car, Home, Film, Heart, BookOpen, MoreHorizontal, Search } from 'lucide-react';
+import { ShoppingCart, Car, Home, Film, Heart, BookOpen, MoreHorizontal, Search, Wallet } from 'lucide-react';
 import { Category, Transaction } from '@/types/finance';
-import { mockTransactions } from '@/data/mockData';
+import { mockTransactions, mockAccounts } from '@/data/mockData';
 
 const categoryIcons: Record<Category, React.ReactNode> = {
   food: <ShoppingCart className="h-4 w-4" />,
@@ -54,6 +54,7 @@ const categoryNames: Record<Category, string> = {
 const ExpensesList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [accountFilter, setAccountFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('date');
   
   // Filtrar e ordenar transações
@@ -61,7 +62,8 @@ const ExpensesList: React.FC = () => {
     .filter((transaction) => {
       const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = categoryFilter === 'all' || transaction.category === categoryFilter;
-      return matchesSearch && matchesCategory;
+      const matchesAccount = accountFilter === 'all' || transaction.accountId === accountFilter;
+      return matchesSearch && matchesCategory && matchesAccount;
     })
     .sort((a, b) => {
       if (sortBy === 'date') {
@@ -78,6 +80,20 @@ const ExpensesList: React.FC = () => {
       style: 'currency',
       currency: 'BRL',
     }).format(value);
+  };
+
+  // Obter nome da conta por ID
+  const getAccountName = (accountId?: string) => {
+    if (!accountId) return 'Desconhecida';
+    const account = mockAccounts.find(acc => acc.id === accountId);
+    return account ? account.name : 'Desconhecida';
+  };
+
+  // Obter cor da conta por ID
+  const getAccountColor = (accountId?: string) => {
+    if (!accountId) return '#B5B5B5';
+    const account = mockAccounts.find(acc => acc.id === accountId);
+    return account ? account.color : '#B5B5B5';
   };
 
   return (
@@ -98,7 +114,7 @@ const ExpensesList: React.FC = () => {
             />
           </div>
           
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Categorias" />
@@ -112,6 +128,26 @@ const ExpensesList: React.FC = () => {
                 <SelectItem value="health">Saúde</SelectItem>
                 <SelectItem value="education">Educação</SelectItem>
                 <SelectItem value="others">Outros</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={accountFilter} onValueChange={setAccountFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Contas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas contas</SelectItem>
+                {mockAccounts.map(account => (
+                  <SelectItem key={account.id} value={account.id}>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-2 h-2 rounded-full" 
+                        style={{ backgroundColor: account.color }}
+                      ></div>
+                      {account.name}
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -138,6 +174,7 @@ const ExpensesList: React.FC = () => {
                 <TableRow>
                   <TableHead>Descrição</TableHead>
                   <TableHead>Categoria</TableHead>
+                  <TableHead>Conta</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead className="text-right">Valor</TableHead>
                 </TableRow>
@@ -162,6 +199,15 @@ const ExpensesList: React.FC = () => {
                           {categoryIcons[transaction.category]}
                         </span>
                         <span>{categoryNames[transaction.category]}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: getAccountColor(transaction.accountId) }}
+                        ></span>
+                        {getAccountName(transaction.accountId)}
                       </div>
                     </TableCell>
                     <TableCell>

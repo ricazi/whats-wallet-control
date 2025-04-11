@@ -1,4 +1,3 @@
-
 export type TransactionType = 'income' | 'expense';
 
 export type Category = 
@@ -10,6 +9,15 @@ export type Category =
   | 'education'
   | 'others';
 
+export interface Account {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  isDefault?: boolean;
+}
+
 export interface Transaction {
   id: string;
   amount: number;
@@ -18,6 +26,7 @@ export interface Transaction {
   type: TransactionType;
   category: Category;
   whatsappSource?: boolean;
+  accountId?: string; // Referência à conta associada
 }
 
 export interface MonthlyBudget {

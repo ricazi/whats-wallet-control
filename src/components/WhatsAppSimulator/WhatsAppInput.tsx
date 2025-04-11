@@ -4,14 +4,48 @@ import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { WhatsAppMessage } from '@/types/finance';
+import { WhatsAppMessage, Account } from '@/types/finance';
 import { mockWhatsAppMessages, parseTransactionFromText, generateBotResponse } from '@/data/mockData';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Contas de exemplo para simulação
+const defaultAccounts: Account[] = [
+  {
+    id: '1',
+    name: 'Pessoal',
+    description: 'Despesas pessoais do dia a dia',
+    icon: 'wallet',
+    color: '#9b87f5',
+    isDefault: true
+  },
+  {
+    id: '2',
+    name: 'Família',
+    description: 'Despesas compartilhadas com a família',
+    icon: 'home',
+    color: '#F97316'
+  },
+  {
+    id: '3',
+    name: 'Trabalho',
+    description: 'Despesas relacionadas ao trabalho',
+    icon: 'briefcase',
+    color: '#0EA5E9'
+  }
+];
 
 const WhatsAppInput: React.FC = () => {
   const [messages, setMessages] = useState<WhatsAppMessage[]>(mockWhatsAppMessages);
   const [newMessage, setNewMessage] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [selectedAccount, setSelectedAccount] = useState<string>('1'); // ID da conta padrão
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -43,8 +77,13 @@ const WhatsAppInput: React.FC = () => {
       // Tenta extrair uma transação da mensagem
       const transaction = parseTransactionFromText(userMessage.content);
       
+      // Se conseguiu extrair uma transação, adiciona o ID da conta selecionada
+      if (transaction) {
+        transaction.accountId = selectedAccount;
+      }
+      
       // Gera uma resposta do bot
-      const botResponse = generateBotResponse(transaction);
+      const botResponse = generateBotResponse(transaction, selectedAccount);
       
       // Adiciona a mensagem do bot
       const botMessage: WhatsAppMessage = {
@@ -59,9 +98,10 @@ const WhatsAppInput: React.FC = () => {
 
       // Notifica o usuário que a transação foi salva
       if (transaction && transaction.amount) {
+        const accountName = defaultAccounts.find(a => a.id === selectedAccount)?.name || 'Pessoal';
         toast({
           title: 'Despesa registrada',
-          description: `${transaction.description} - R$ ${transaction.amount} na categoria ${transaction.category}`,
+          description: `${transaction.description} - R$ ${transaction.amount} na categoria ${transaction.category} (Conta: ${accountName})`,
         });
       }
     }, 1000); // Simula 1 segundo de processamento
@@ -75,6 +115,10 @@ const WhatsAppInput: React.FC = () => {
 
   const formatTime = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const getAccountColor = (accountId: string) => {
+    return defaultAccounts.find(acc => acc.id === accountId)?.color || '#9b87f5';
   };
 
   return (
@@ -91,6 +135,25 @@ const WhatsAppInput: React.FC = () => {
           Envie suas despesas e receba atualizações aqui
         </CardDescription>
       </CardHeader>
+
+      <div className="px-4 py-2 border-b flex items-center gap-2 bg-gray-50">
+        <div className="text-sm font-medium">Conta:</div>
+        <Select value={selectedAccount} onValueChange={setSelectedAccount}>
+          <SelectTrigger className="w-[140px] h-8 text-sm">
+            <SelectValue placeholder="Selecionar conta" />
+          </SelectTrigger>
+          <SelectContent>
+            {defaultAccounts.map((account) => (
+              <SelectItem key={account.id} value={account.id}>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: account.color }}></div>
+                  <span>{account.name}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <CardContent className="flex-grow overflow-y-auto mb-0 pb-0 pt-6 h-[500px]">
         <div className="space-y-4">
@@ -142,7 +205,8 @@ const WhatsAppInput: React.FC = () => {
             variant="default"
             disabled={isTyping || newMessage.trim() === ''}
             onClick={handleSendMessage}
-            className="bg-green-500 hover:bg-green-600"
+            style={{ backgroundColor: getAccountColor(selectedAccount) }}
+            className="hover:opacity-90"
           >
             <Send className="h-4 w-4" />
           </Button>

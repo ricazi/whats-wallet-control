@@ -9,6 +9,7 @@ import Expenses from "./pages/Expenses";
 import Reports from "./pages/Reports";
 import WhatsApp from "./pages/WhatsApp";
 import Settings from "./pages/Settings";
+import Accounts from "./pages/Accounts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/whatsapp" element={<WhatsApp />} />
+          <Route path="/accounts" element={<Accounts />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,10 +1,35 @@
-
-import { Transaction, MonthlyBudget, MonthlySummary, SavingSuggestion, WhatsAppMessage, Category, CategorySummary } from '../types/finance';
+import { Transaction, MonthlyBudget, MonthlySummary, SavingSuggestion, WhatsAppMessage, Category, CategorySummary, Account } from '../types/finance';
 
 // Função para gerar IDs únicos
 const generateId = (): string => {
   return Math.random().toString(36).substring(2, 15);
 };
+
+// Contas de exemplo
+export const mockAccounts: Account[] = [
+  {
+    id: '1',
+    name: 'Pessoal',
+    description: 'Despesas pessoais do dia a dia',
+    icon: 'wallet',
+    color: '#9b87f5',
+    isDefault: true
+  },
+  {
+    id: '2',
+    name: 'Família',
+    description: 'Despesas compartilhadas com a família',
+    icon: 'home',
+    color: '#F97316'
+  },
+  {
+    id: '3',
+    name: 'Trabalho',
+    description: 'Despesas relacionadas ao trabalho',
+    icon: 'briefcase',
+    color: '#0EA5E9'
+  }
+];
 
 // Dados de transações de exemplo
 export const mockTransactions: Transaction[] = [
@@ -15,6 +40,7 @@ export const mockTransactions: Transaction[] = [
     date: '2025-04-01T08:00:00',
     type: 'income',
     category: 'others',
+    accountId: '1'
   },
   {
     id: generateId(),
@@ -23,6 +49,7 @@ export const mockTransactions: Transaction[] = [
     date: '2025-04-03T14:30:00',
     type: 'income',
     category: 'others',
+    accountId: '1'
   },
   {
     id: generateId(),
@@ -32,6 +59,7 @@ export const mockTransactions: Transaction[] = [
     type: 'expense',
     category: 'food',
     whatsappSource: true,
+    accountId: '1'
   },
   {
     id: generateId(),
@@ -41,6 +69,7 @@ export const mockTransactions: Transaction[] = [
     type: 'expense',
     category: 'transport',
     whatsappSource: true,
+    accountId: '1'
   },
   {
     id: generateId(),
@@ -49,6 +78,7 @@ export const mockTransactions: Transaction[] = [
     date: '2025-04-10T09:00:00',
     type: 'expense',
     category: 'housing',
+    accountId: '2'
   },
   {
     id: generateId(),
@@ -58,6 +88,7 @@ export const mockTransactions: Transaction[] = [
     type: 'expense',
     category: 'entertainment',
     whatsappSource: true,
+    accountId: '1'
   },
   {
     id: generateId(),
@@ -66,6 +97,7 @@ export const mockTransactions: Transaction[] = [
     date: '2025-04-18T10:30:00',
     type: 'expense',
     category: 'health',
+    accountId: '1'
   },
   {
     id: generateId(),
@@ -74,6 +106,7 @@ export const mockTransactions: Transaction[] = [
     date: '2025-04-20T14:00:00',
     type: 'expense',
     category: 'education',
+    accountId: '3'
   },
   {
     id: generateId(),
@@ -83,6 +116,7 @@ export const mockTransactions: Transaction[] = [
     type: 'expense',
     category: 'food',
     whatsappSource: true,
+    accountId: '2'
   },
 ];
 
@@ -249,7 +283,10 @@ export const parseTransactionFromText = (text: string): Partial<Transaction> | n
 };
 
 // Função para gerar resposta do bot
-export const generateBotResponse = (transaction: Partial<Transaction>): string => {
+export const generateBotResponse = (
+  transaction: Partial<Transaction> | null, 
+  accountId: string = '1'
+): string => {
   if (!transaction || !transaction.amount) {
     return "Desculpe, não consegui identificar um valor válido na sua mensagem. Pode tentar novamente?";
   }
@@ -264,7 +301,8 @@ export const generateBotResponse = (transaction: Partial<Transaction>): string =
     others: "outros"
   };
   
+  const accountName = mockAccounts.find(acc => acc.id === accountId)?.name || "Pessoal";
   const categoryName = categoryNames[transaction.category || 'others'];
   
-  return `Registrado! R$ ${transaction.amount} ${transaction.description ? `para ${transaction.description}` : ''} como despesa na categoria "${categoryName}".`;
+  return `Registrado! R$ ${transaction.amount} ${transaction.description ? `para ${transaction.description}` : ''} como despesa na categoria "${categoryName}" na conta "${accountName}".`;
 };
