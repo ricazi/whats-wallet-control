@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ShoppingCart, Car, Home, Film, Heart, BookOpen, MoreHorizontal, Search, Wallet } from 'lucide-react';
+import { ShoppingCart, Car, Home, Film, Heart, BookOpen, MoreHorizontal, Search, Wallet, Flower, Wrench, Dumbbell, Scissors, Smartphone, Shirt, Cat } from 'lucide-react';
 import { Category, Transaction } from '@/types/finance';
 import { mockTransactions, mockAccounts } from '@/data/mockData';
 
@@ -29,6 +28,13 @@ const categoryIcons: Record<Category, React.ReactNode> = {
   health: <Heart className="h-4 w-4" />,
   education: <BookOpen className="h-4 w-4" />,
   others: <MoreHorizontal className="h-4 w-4" />,
+  gardening: <Flower className="h-4 w-4" />,
+  maintenance: <Wrench className="h-4 w-4" />,
+  fitness: <Dumbbell className="h-4 w-4" />,
+  beauty: <Scissors className="h-4 w-4" />,
+  technology: <Smartphone className="h-4 w-4" />,
+  clothing: <Shirt className="h-4 w-4" />,
+  pets: <Cat className="h-4 w-4" />
 };
 
 const categoryColors: Record<Category, string> = {
@@ -39,6 +45,13 @@ const categoryColors: Record<Category, string> = {
   health: '#4CC9F0',
   education: '#4361EE',
   others: '#B5B5B5',
+  gardening: '#78C850',
+  maintenance: '#A0A0A0',
+  fitness: '#FF5252',
+  beauty: '#FF80AB',
+  technology: '#00B0FF',
+  clothing: '#8C9EFF',
+  pets: '#FFD54F'
 };
 
 const categoryNames: Record<Category, string> = {
@@ -49,6 +62,13 @@ const categoryNames: Record<Category, string> = {
   health: 'Saúde',
   education: 'Educação',
   others: 'Outros',
+  gardening: 'Jardinagem',
+  maintenance: 'Manutenção',
+  fitness: 'Fitness',
+  beauty: 'Beleza',
+  technology: 'Tecnologia',
+  clothing: 'Vestuário',
+  pets: 'Pets'
 };
 
 const ExpensesList: React.FC = () => {
@@ -57,7 +77,6 @@ const ExpensesList: React.FC = () => {
   const [accountFilter, setAccountFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('date');
   
-  // Filtrar e ordenar transações
   const filteredTransactions = mockTransactions
     .filter((transaction) => {
       const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -74,7 +93,6 @@ const ExpensesList: React.FC = () => {
       return 0;
     });
 
-  // Formatar valores monetários
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -82,14 +100,12 @@ const ExpensesList: React.FC = () => {
     }).format(value);
   };
 
-  // Obter nome da conta por ID
   const getAccountName = (accountId?: string) => {
     if (!accountId) return 'Desconhecida';
     const account = mockAccounts.find(acc => acc.id === accountId);
     return account ? account.name : 'Desconhecida';
   };
 
-  // Obter cor da conta por ID
   const getAccountColor = (accountId?: string) => {
     if (!accountId) return '#B5B5B5';
     const account = mockAccounts.find(acc => acc.id === accountId);
@@ -128,6 +144,13 @@ const ExpensesList: React.FC = () => {
                 <SelectItem value="health">Saúde</SelectItem>
                 <SelectItem value="education">Educação</SelectItem>
                 <SelectItem value="others">Outros</SelectItem>
+                <SelectItem value="gardening">Jardinagem</SelectItem>
+                <SelectItem value="maintenance">Manutenção</SelectItem>
+                <SelectItem value="fitness">Fitness</SelectItem>
+                <SelectItem value="beauty">Beleza</SelectItem>
+                <SelectItem value="technology">Tecnologia</SelectItem>
+                <SelectItem value="clothing">Vestuário</SelectItem>
+                <SelectItem value="pets">Pets</SelectItem>
               </SelectContent>
             </Select>
 
