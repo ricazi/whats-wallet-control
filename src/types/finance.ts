@@ -7,7 +7,14 @@ export type Category =
   | 'entertainment' 
   | 'health'
   | 'education'
-  | 'others';
+  | 'others'
+  | 'gardening'
+  | 'maintenance'
+  | 'fitness'
+  | 'beauty'
+  | 'technology'
+  | 'clothing'
+  | 'pets';
 
 export interface Account {
   id: string;
@@ -26,7 +33,8 @@ export interface Transaction {
   type: TransactionType;
   category: Category;
   whatsappSource?: boolean;
-  accountId?: string; // Referência à conta associada
+  accountId?: string;
+  subcategory?: string;
 }
 
 export interface MonthlyBudget {

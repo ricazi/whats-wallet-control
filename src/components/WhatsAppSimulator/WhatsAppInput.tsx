@@ -41,11 +41,29 @@ const defaultAccounts: Account[] = [
   }
 ];
 
+// Palavras-chave para categorização automática
+const categoryKeywords = {
+  food: ['comida', 'restaurante', 'lanche', 'almoço', 'jantar', 'café', 'mercado', 'supermercado', 'pizza', 'refeição'],
+  transport: ['carro', 'uber', 'táxi', 'gasolina', 'combustível', 'transporte', 'ônibus', 'trem', 'metrô', 'passagem'],
+  housing: ['aluguel', 'condomínio', 'luz', 'água', 'gás', 'internet', 'telefone', 'moradia', 'casa', 'apartamento'],
+  entertainment: ['cinema', 'teatro', 'show', 'streaming', 'netflix', 'spotify', 'jogo', 'livro', 'passeio', 'viagem'],
+  health: ['médico', 'hospital', 'remédio', 'farmácia', 'consulta', 'exame', 'saúde', 'plano de saúde', 'fisioterapia', 'dentista'],
+  education: ['curso', 'faculdade', 'escola', 'livro', 'material', 'aula', 'educação', 'apostila', 'treinamento', 'certificação'],
+  gardening: ['planta', 'jardim', 'flor', 'adubo', 'jardinagem', 'horta', 'vaso', 'terra', 'sementes', 'poda'],
+  maintenance: ['conserto', 'reparo', 'manutenção', 'encanador', 'eletricista', 'pintura', 'reforma', 'ferramenta', 'peça', 'serviço'],
+  fitness: ['academia', 'treino', 'exercício', 'personal', 'equipamento', 'suplemento', 'esporte', 'natação', 'pilates', 'yoga'],
+  beauty: ['cabelo', 'salão', 'manicure', 'pedicure', 'spa', 'massagem', 'estética', 'cuidados', 'maquiagem', 'produtos'],
+  technology: ['celular', 'computador', 'notebook', 'tablet', 'gadget', 'software', 'aplicativo', 'eletrônico', 'acessório', 'carregador'],
+  clothing: ['roupa', 'calçado', 'tênis', 'sapato', 'camisa', 'calça', 'vestido', 'jaqueta', 'casaco', 'acessório'],
+  pets: ['animal', 'cachorro', 'gato', 'pet', 'ração', 'veterinário', 'petshop', 'brinquedo', 'remédio', 'banho']
+};
+
 const WhatsAppInput: React.FC = () => {
   const [messages, setMessages] = useState<WhatsAppMessage[]>(mockWhatsAppMessages);
   const [newMessage, setNewMessage] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [selectedAccount, setSelectedAccount] = useState<string>('1'); // ID da conta padrão
+  const [autoCreatedCategories, setAutoCreatedCategories] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -55,6 +73,41 @@ const WhatsAppInput: React.FC = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Função para determinar categoria automática baseada no texto da mensagem
+  const detectCategory = (text: string): { category: string, subcategory: string | null } => {
+    // Converte para minúsculas para facilitar a comparação
+    const lowerText = text.toLowerCase();
+    
+    // Verifica palavras-chave em cada categoria
+    for (const [category, keywords] of Object.entries(categoryKeywords)) {
+      for (const keyword of keywords) {
+        if (lowerText.includes(keyword)) {
+          return { category, subcategory: null };
+        }
+      }
+    }
+    
+    // Se nenhuma palavra-chave for encontrada, verifica se há uma nova subcategoria
+    // Extrai possíveis subcategorias do texto (geralmente substantivos no início da frase)
+    const words = lowerText.split(/\s+/);
+    const potentialSubcategory = words.find(word => 
+      word.length > 3 && 
+      !['gastei', 'paguei', 'comprei', 'para', 'com', 'reais', 'valor'].includes(word)
+    );
+    
+    if (potentialSubcategory) {
+      // Se encontrou uma potencial subcategoria, verifica se ela já existe
+      if (!autoCreatedCategories.has(potentialSubcategory)) {
+        return { 
+          category: 'others', // Categoria padrão
+          subcategory: potentialSubcategory 
+        };
+      }
+    }
+    
+    return { category: 'others', subcategory: null };
   };
 
   const handleSendMessage = () => {
@@ -77,18 +130,32 @@ const WhatsAppInput: React.FC = () => {
       // Tenta extrair uma transação da mensagem
       const transaction = parseTransactionFromText(userMessage.content);
       
-      // Se conseguiu extrair uma transação, adiciona o ID da conta selecionada
       if (transaction) {
+        // Determina a categoria baseada no conteúdo da mensagem
+        const { category, subcategory } = detectCategory(userMessage.content);
         transaction.accountId = selectedAccount;
+        transaction.category = category as any;
+        
+        // Se identificou uma nova subcategoria, adiciona ao transaction e ao set de categorias criadas
+        if (subcategory) {
+          transaction.subcategory = subcategory;
+          setAutoCreatedCategories(prev => new Set(prev).add(subcategory));
+        }
       }
       
       // Gera uma resposta do bot
       const botResponse = generateBotResponse(transaction, selectedAccount);
       
+      // Se criou uma nova subcategoria, adiciona uma mensagem específica
+      let finalBotResponse = botResponse;
+      if (transaction?.subcategory) {
+        finalBotResponse = `${botResponse}\n\nCriei a subcategoria "${transaction.subcategory}" dentro da categoria ${transaction.category}.`;
+      }
+      
       // Adiciona a mensagem do bot
       const botMessage: WhatsAppMessage = {
         id: Math.random().toString(36).substring(2, 15),
-        content: botResponse,
+        content: finalBotResponse,
         timestamp: new Date().toISOString(),
         fromUser: false,
       };
@@ -99,9 +166,13 @@ const WhatsAppInput: React.FC = () => {
       // Notifica o usuário que a transação foi salva
       if (transaction && transaction.amount) {
         const accountName = defaultAccounts.find(a => a.id === selectedAccount)?.name || 'Pessoal';
+        const categoryDisplay = transaction.subcategory 
+          ? `${transaction.category} (${transaction.subcategory})`
+          : transaction.category;
+          
         toast({
           title: 'Despesa registrada',
-          description: `${transaction.description} - R$ ${transaction.amount} na categoria ${transaction.category} (Conta: ${accountName})`,
+          description: `${transaction.description} - R$ ${transaction.amount} na categoria ${categoryDisplay} (Conta: ${accountName})`,
         });
       }
     }, 1000); // Simula 1 segundo de processamento

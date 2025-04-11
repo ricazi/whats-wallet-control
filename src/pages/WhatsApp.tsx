@@ -29,8 +29,8 @@ const WhatsApp: React.FC = () => {
                 <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center mx-auto mb-4">
                   <span className="text-xl">2</span>
                 </div>
-                <h3 className="font-medium mb-2">Processamento automático</h3>
-                <p className="text-gray-600 text-sm">O sistema categoriza e registra suas despesas</p>
+                <h3 className="font-medium mb-2">Categorização automática</h3>
+                <p className="text-gray-600 text-sm">O sistema identifica e cria categorias automaticamente</p>
               </div>
 
               <div className="p-4 rounded-lg bg-purple-50 border border-purple-100">
@@ -48,6 +48,15 @@ const WhatsApp: React.FC = () => {
                 Para melhor experiência, inclua sempre o valor e uma descrição da sua despesa. 
                 Exemplo: <span className="font-medium">"Gastei R$ 50 no restaurante"</span> ou 
                 <span className="font-medium">"Uber para o trabalho, R$ 25"</span>
+              </p>
+            </div>
+            
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 mt-2">
+              <h4 className="font-medium mb-1">Categorização inteligente:</h4>
+              <p className="text-sm">
+                O app cria automaticamente novas subcategorias com base nas suas despesas. Por exemplo: 
+                <span className="font-medium">"Fisioterapia R$ 250"</span> será categorizado como Saúde, e 
+                <span className="font-medium">"Plantas para casa R$ 30"</span> como Jardinagem.
               </p>
             </div>
           </CardContent>
