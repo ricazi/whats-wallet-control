@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -53,17 +52,15 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				expense: 'hsl(var(--expense))',
-				income: 'hsl(var(--income))',
-				// Categorias financeiras
-				finance: {
-					food: '#FF9F1C',        // Laranja para alimentação
-					transport: '#2EC4B6',   // Turquesa para transporte
-					housing: '#E71D36',     // Vermelho para moradia
-					entertainment: '#7209B7', // Roxo para lazer
-					health: '#4CC9F0',      // Azul claro para saúde
-					education: '#4361EE',   // Azul para educação
-					others: '#B5B5B5',      // Cinza para outros
+				sidebar: {
+					DEFAULT: 'hsl(var(--sidebar-background))',
+					foreground: 'hsl(var(--sidebar-foreground))',
+					primary: 'hsl(var(--sidebar-primary))',
+					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+					accent: 'hsl(var(--sidebar-accent))',
+					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+					border: 'hsl(var(--sidebar-border))',
+					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
 			borderRadius: {
@@ -87,16 +84,11 @@ export default {
 					to: {
 						height: '0'
 					}
-				},
-				'pulse-slow': {
-					'0%, 100%': { opacity: '1' },
-					'50%': { opacity: '0.7' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out',
-				'pulse-slow': 'pulse-slow 2s ease-in-out infinite',
+				'accordion-up': 'accordion-up 0.2s ease-out'
 			}
 		}
 	},
