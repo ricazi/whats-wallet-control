@@ -1,125 +1,308 @@
+import { Transaction, MonthlyBudget, MonthlySummary, SavingSuggestion, WhatsAppMessage, Category, CategorySummary, Account } from '../types/finance';
 
-// Mock Transactions
-export const mockTransactions = [
+// Função para gerar IDs únicos
+const generateId = (): string => {
+  return Math.random().toString(36).substring(2, 15);
+};
+
+// Contas de exemplo
+export const mockAccounts: Account[] = [
   {
-    id: "tx1",
-    date: "2024-04-10",
-    description: "Grocery Shopping",
-    amount: -120.50,
-    category: "Food",
-    accountId: "acc1"
+    id: '1',
+    name: 'Pessoal',
+    description: 'Despesas pessoais do dia a dia',
+    icon: 'wallet',
+    color: '#9b87f5',
+    isDefault: true
   },
   {
-    id: "tx2",
-    date: "2024-04-08",
-    description: "Salary Deposit",
-    amount: 2500.00,
-    category: "Income",
-    accountId: "acc1"
+    id: '2',
+    name: 'Família',
+    description: 'Despesas compartilhadas com a família',
+    icon: 'home',
+    color: '#F97316'
   },
   {
-    id: "tx3",
-    date: "2024-04-05",
-    description: "Restaurant",
-    amount: -45.80,
-    category: "Food",
-    accountId: "acc2"
-  },
-  {
-    id: "tx4",
-    date: "2024-04-03",
-    description: "Internet Bill",
-    amount: -79.99,
-    category: "Utilities",
-    accountId: "acc1"
-  },
-  {
-    id: "tx5",
-    date: "2024-04-01",
-    description: "Movie Tickets",
-    amount: -25.00,
-    category: "Entertainment",
-    accountId: "acc2"
+    id: '3',
+    name: 'Trabalho',
+    description: 'Despesas relacionadas ao trabalho',
+    icon: 'briefcase',
+    color: '#0EA5E9'
   }
 ];
 
-// Mock Accounts
-export const mockAccounts = [
+// Dados de transações de exemplo
+export const mockTransactions: Transaction[] = [
   {
-    id: "acc1",
-    name: "Main Checking",
-    balance: 3254.75,
-    type: "Checking"
+    id: generateId(),
+    amount: 1200,
+    description: 'Salário',
+    date: '2025-04-01T08:00:00',
+    type: 'income',
+    category: 'others',
+    accountId: '1'
   },
   {
-    id: "acc2",
-    name: "Savings",
-    balance: 12500.00,
-    type: "Savings"
+    id: generateId(),
+    amount: 500,
+    description: 'Freelance',
+    date: '2025-04-03T14:30:00',
+    type: 'income',
+    category: 'others',
+    accountId: '1'
   },
   {
-    id: "acc3",
-    name: "Credit Card",
-    balance: -450.25,
-    type: "Credit"
+    id: generateId(),
+    amount: 150,
+    description: 'Supermercado',
+    date: '2025-04-05T18:20:00',
+    type: 'expense',
+    category: 'food',
+    whatsappSource: true,
+    accountId: '1'
+  },
+  {
+    id: generateId(),
+    amount: 60,
+    description: 'Uber',
+    date: '2025-04-06T21:15:00',
+    type: 'expense',
+    category: 'transport',
+    whatsappSource: true,
+    accountId: '1'
+  },
+  {
+    id: generateId(),
+    amount: 500,
+    description: 'Aluguel',
+    date: '2025-04-10T09:00:00',
+    type: 'expense',
+    category: 'housing',
+    accountId: '2'
+  },
+  {
+    id: generateId(),
+    amount: 80,
+    description: 'Cinema com amigos',
+    date: '2025-04-15T20:00:00',
+    type: 'expense',
+    category: 'entertainment',
+    whatsappSource: true,
+    accountId: '1'
+  },
+  {
+    id: generateId(),
+    amount: 120,
+    description: 'Consulta médica',
+    date: '2025-04-18T10:30:00',
+    type: 'expense',
+    category: 'health',
+    accountId: '1'
+  },
+  {
+    id: generateId(),
+    amount: 200,
+    description: 'Curso online',
+    date: '2025-04-20T14:00:00',
+    type: 'expense',
+    category: 'education',
+    accountId: '3'
+  },
+  {
+    id: generateId(),
+    amount: 70,
+    description: 'Restaurante',
+    date: '2025-04-22T19:45:00',
+    type: 'expense',
+    category: 'food',
+    whatsappSource: true,
+    accountId: '2'
+  },
+];
+
+// Orçamento mensal de exemplo
+export const mockMonthlyBudget: MonthlyBudget = {
+  income: 1700,
+  expenses: 1180,
+  month: '2025-04',
+};
+
+// Função para calcular o resumo por categoria
+export const calculateCategorySummary = (transactions: Transaction[]): CategorySummary[] => {
+  const expenses = transactions.filter(t => t.type === 'expense');
+  const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
+  
+  const categories: Category[] = ['food', 'transport', 'housing', 'entertainment', 'health', 'education', 'others'];
+  
+  return categories.map(category => {
+    const amount = expenses
+      .filter(t => t.category === category)
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    return {
+      category,
+      amount,
+      percentage: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0
+    };
+  }).filter(summary => summary.amount > 0);
+};
+
+// Resumo mensal de exemplo
+export const mockMonthlySummary: MonthlySummary = {
+  month: '2025-04',
+  income: mockMonthlyBudget.income,
+  expenses: mockMonthlyBudget.expenses,
+  balance: mockMonthlyBudget.income - mockMonthlyBudget.expenses,
+  categorySummary: calculateCategorySummary(mockTransactions)
+};
+
+// Sugestões de economia de exemplo
+export const mockSavingSuggestions: SavingSuggestion[] = [
+  {
+    id: generateId(),
+    category: 'food',
+    title: 'Reduza gastos com delivery',
+    description: 'Preparar refeições em casa pode economizar até R$ 200 por mês.',
+    potentialSaving: 200,
+  },
+  {
+    id: generateId(),
+    category: 'transport',
+    title: 'Use transporte público',
+    description: 'Substituir Uber por transporte público em dias regulares.',
+    potentialSaving: 150,
+  },
+  {
+    id: generateId(),
+    category: 'entertainment',
+    title: 'Aproveite opções gratuitas',
+    description: 'Busque eventos gratuitos e promoções para lazer.',
+    potentialSaving: 100,
+  },
+];
+
+// Mensagens do WhatsApp de exemplo
+export const mockWhatsAppMessages: WhatsAppMessage[] = [
+  {
+    id: generateId(),
+    content: 'Olá! Como posso te ajudar com suas finanças hoje?',
+    timestamp: '2025-04-05T18:00:00',
+    fromUser: false,
+  },
+  {
+    id: generateId(),
+    content: 'Gastei R$ 150 no supermercado hoje',
+    timestamp: '2025-04-05T18:05:00',
+    fromUser: true,
+  },
+  {
+    id: generateId(),
+    content: 'Registrado! R$ 150 no supermercado como despesa na categoria "alimentação".',
+    timestamp: '2025-04-05T18:05:05',
+    fromUser: false,
+  },
+  {
+    id: generateId(),
+    content: 'Uber para o trabalho R$ 60',
+    timestamp: '2025-04-06T21:10:00',
+    fromUser: true,
+  },
+  {
+    id: generateId(),
+    content: 'Anotado! R$ 60 para Uber como despesa na categoria "transporte".',
+    timestamp: '2025-04-06T21:10:05',
+    fromUser: false,
+  },
+  {
+    id: generateId(),
+    content: 'Fui ao cinema com amigos, gastei R$ 80',
+    timestamp: '2025-04-15T19:55:00',
+    fromUser: true,
+  },
+  {
+    id: generateId(),
+    content: 'Registrei! R$ 80 para cinema como despesa na categoria "lazer".',
+    timestamp: '2025-04-15T19:55:05',
+    fromUser: false,
+  },
+  {
+    id: generateId(),
+    content: 'Almocei em um restaurante, R$ 70',
+    timestamp: '2025-04-22T19:40:00',
+    fromUser: true,
+  },
+  {
+    id: generateId(),
+    content: 'Registrado! R$ 70 no restaurante como despesa na categoria "alimentação".',
+    timestamp: '2025-04-22T19:40:05',
+    fromUser: false,
+  },
+];
+
+// Função para analisar texto e extrair informações de transação
+export const parseTransactionFromText = (text: string): Partial<Transaction> | null => {
+  // Expressão regular para encontrar valores monetários (ex: R$ 50, 50 reais, 50)
+  const amountRegex = /R\$\s*(\d+(?:[.,]\d+)?)|(\d+(?:[.,]\d+)?)\s*reais|\b(\d+(?:[.,]\d+)?)\b/i;
+  const amountMatch = text.match(amountRegex);
+  
+  if (!amountMatch) return null;
+  
+  // Captura o primeiro grupo que corresponde a um valor
+  const amountValue = amountMatch[1] || amountMatch[2] || amountMatch[3];
+  const amount = parseFloat(amountValue.replace(',', '.'));
+  
+  // Determina a categoria com base em palavras-chave
+  let category: Category = 'others';
+  
+  if (/mercado|comida|restaurante|lanche|café|pizza|ifood/i.test(text)) {
+    category = 'food';
+  } else if (/uber|ônibus|táxi|transporte|gasolina|combustível|metrô/i.test(text)) {
+    category = 'transport';
+  } else if (/aluguel|casa|apartamento|condomínio|luz|água|gás|internet/i.test(text)) {
+    category = 'housing';
+  } else if (/cinema|festa|balada|show|teatro|shopping|parque|diversão/i.test(text)) {
+    category = 'entertainment';
+  } else if (/médico|hospital|remédio|farmácia|consulta|exame|academia/i.test(text)) {
+    category = 'health';
+  } else if (/curso|faculdade|escola|livro|estudo|educação/i.test(text)) {
+    category = 'education';
   }
-];
+  
+  // Extrai a descrição com base nas palavras ao redor do valor
+  const wordsAroundAmount = text.split(/\s+/).slice(Math.max(0, amountMatch.index - 20), amountMatch.index + 20).join(' ');
+  const description = wordsAroundAmount || text.substring(0, 30);
+  
+  return {
+    amount,
+    description,
+    date: new Date().toISOString(),
+    type: 'expense', // Assume que é uma despesa por padrão
+    category,
+    whatsappSource: true
+  };
+};
 
-// Mock Monthly Summary
-export const mockMonthlySummary = [
-  { month: "Jan", income: 3200, expenses: 2700 },
-  { month: "Feb", income: 3200, expenses: 2900 },
-  { month: "Mar", income: 3200, expenses: 2400 },
-  { month: "Apr", income: 3500, expenses: 2800 },
-  { month: "May", income: 3500, expenses: 2600 },
-  { month: "Jun", income: 3500, expenses: 3100 },
-  { month: "Jul", income: 3500, expenses: 2750 },
-  { month: "Aug", income: 3800, expenses: 2900 },
-  { month: "Sep", income: 3800, expenses: 2650 },
-  { month: "Oct", income: 3800, expenses: 2800 },
-  { month: "Nov", income: 3800, expenses: 3200 },
-  { month: "Dec", income: 4200, expenses: 3600 }
-];
-
-// Mock Saving Suggestions
-export const mockSavingSuggestions = [
-  {
-    id: "sug1",
-    title: "Reduce Food Expenses",
-    description: "Your food expenses are 20% higher than last month. Consider meal prepping to save money.",
-    potentialSavings: 150,
-    category: "Food"
-  },
-  {
-    id: "sug2",
-    title: "Entertainment Budget",
-    description: "Your entertainment spending has increased significantly. Try finding free activities.",
-    potentialSavings: 75,
-    category: "Entertainment"
-  },
-  {
-    id: "sug3",
-    title: "Utility Bill Savings",
-    description: "Your electricity bill seems higher than average. Consider energy-saving measures.",
-    potentialSavings: 45,
-    category: "Utilities"
+// Função para gerar resposta do bot
+export const generateBotResponse = (
+  transaction: Partial<Transaction> | null, 
+  accountId: string = '1'
+): string => {
+  if (!transaction || !transaction.amount) {
+    return "Desculpe, não consegui identificar um valor válido na sua mensagem. Pode tentar novamente?";
   }
-];
-
-// Mock Categories with spending amounts
-export const mockCategories = [
-  { name: "Food", amount: 650 },
-  { name: "Housing", amount: 1200 },
-  { name: "Transportation", amount: 350 },
-  { name: "Utilities", amount: 180 },
-  { name: "Entertainment", amount: 220 },
-  { name: "Healthcare", amount: 160 },
-  { name: "Other", amount: 140 }
-];
-
-// Mock Budget Goals
-export const mockBudgetGoals = [
-  { category: "Food", budgeted: 600, actual: 650 },
-  { category: "Transportation", budgeted: 300, actual: 350 },
-  { category: "Entertainment", budgeted: 200, actual: 220 }
-];
+  
+  const categoryNames: Record<Category, string> = {
+    food: "alimentação",
+    transport: "transporte",
+    housing: "moradia",
+    entertainment: "lazer",
+    health: "saúde",
+    education: "educação",
+    others: "outros"
+  };
+  
+  const accountName = mockAccounts.find(acc => acc.id === accountId)?.name || "Pessoal";
+  const categoryName = categoryNames[transaction.category || 'others'];
+  
+  return `Registrado! R$ ${transaction.amount} ${transaction.description ? `para ${transaction.description}` : ''} como despesa na categoria "${categoryName}" na conta "${accountName}".`;
+};
