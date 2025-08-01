@@ -298,7 +298,14 @@ export const generateBotResponse = (
     entertainment: "lazer",
     health: "saúde",
     education: "educação",
-    others: "outros"
+    others: "outros",
+    gardening: "jardinagem",
+    maintenance: "manutenção",
+    fitness: "fitness",
+    beauty: "beleza",
+    technology: "tecnologia",
+    clothing: "roupas",
+    pets: "pets"
   };
   
   const accountName = mockAccounts.find(acc => acc.id === accountId)?.name || "Pessoal";

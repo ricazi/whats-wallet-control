@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ShoppingCart, Car, Home, Film, Heart, BookOpen, MoreHorizontal, Search, Wallet } from 'lucide-react';
+import { ShoppingCart, Car, Home, Film, Heart, BookOpen, MoreHorizontal, Search, Wallet, Flower, Wrench, Dumbbell, Sparkles, Laptop, Shirt, PawPrint } from 'lucide-react';
 import { Category, Transaction } from '@/types/finance';
 import { mockTransactions, mockAccounts } from '@/data/mockData';
 
@@ -29,6 +29,13 @@ const categoryIcons: Record<Category, React.ReactNode> = {
   health: <Heart className="h-4 w-4" />,
   education: <BookOpen className="h-4 w-4" />,
   others: <MoreHorizontal className="h-4 w-4" />,
+  gardening: <Flower className="h-4 w-4" />,
+  maintenance: <Wrench className="h-4 w-4" />,
+  fitness: <Dumbbell className="h-4 w-4" />,
+  beauty: <Sparkles className="h-4 w-4" />,
+  technology: <Laptop className="h-4 w-4" />,
+  clothing: <Shirt className="h-4 w-4" />,
+  pets: <PawPrint className="h-4 w-4" />,
 };
 
 const categoryColors: Record<Category, string> = {
@@ -39,6 +46,13 @@ const categoryColors: Record<Category, string> = {
   health: '#4CC9F0',
   education: '#4361EE',
   others: '#B5B5B5',
+  gardening: '#22C55E',
+  maintenance: '#F59E0B',
+  fitness: '#EF4444',
+  beauty: '#EC4899',
+  technology: '#6366F1',
+  clothing: '#8B5CF6',
+  pets: '#F97316',
 };
 
 const categoryNames: Record<Category, string> = {
@@ -49,6 +63,13 @@ const categoryNames: Record<Category, string> = {
   health: 'Saúde',
   education: 'Educação',
   others: 'Outros',
+  gardening: 'Jardinagem',
+  maintenance: 'Manutenção',
+  fitness: 'Fitness',
+  beauty: 'Beleza',
+  technology: 'Tecnologia',
+  clothing: 'Roupas',
+  pets: 'Pets',
 };
 
 const ExpensesList: React.FC = () => {
